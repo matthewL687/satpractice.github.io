@@ -1,1 +1,0 @@
-# satpractice.github.io

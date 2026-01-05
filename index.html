@@ -211,49 +211,47 @@
   }
 
   async function generateQuestion() {
-    const sectionValue = sectionSelect.value;
-    const topic = topicSelect.value;
-    const difficulty = difficultySelect.value;
+  const sectionValue = sectionSelect.value;
+  const topic = topicSelect.value;
+  const difficulty = difficultySelect.value;
 
-    if (!sectionValue || !topic || !difficulty) {
-      alert('Please select section, topic, and difficulty.');
-      return;
-    }
-
-    // convert dropdown value to the exact strings your Python prompt expects
-    const section = (sectionValue === "reading-writing") ? "Reading and Writing" : "Math";
-
-    generateBtn.disabled = true;
-    displayDiv.innerHTML = '<div class="loading">Generating your practice question...</div>';
-
-    try {
-      const resp = await fetch("/api/generate-question", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ section, topic, difficulty })
-      });
-
-      const data = await resp.json().catch(() => ({}));
-      if (!resp.ok) {
-        throw new Error(data.error || `Request failed (${resp.status})`);
-      }
-
-      displayDiv.innerHTML = `
-        <div class="question-container">
-          <div class="question-text"></div>
-        </div>
-      `;
-      displayDiv.querySelector(".question-text").textContent = data.text || "(No text returned)";
-    } catch (err) {
-      displayDiv.innerHTML = `
-        <div class="question-container">
-          <div class="question-text error">Error: ${String(err)}</div>
-        </div>
-      `;
-    } finally {
-      generateBtn.disabled = false;
-    }
+  if (!sectionValue || !topic || !difficulty) {
+    alert('Please select section, topic, and difficulty.');
+    return;
   }
+
+  const section = (sectionValue === "reading-writing") ? "Reading and Writing" : "Math";
+
+  generateBtn.disabled = true;
+  displayDiv.innerHTML = '<div class="loading">Generating your practice question...</div>';
+
+  try {
+    const resp = await fetch("/api/generate-question", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ section, topic, difficulty })
+    });
+
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || "Request failed");
+
+    displayDiv.innerHTML = `
+      <div class="question-container">
+        <div class="question-text"></div>
+      </div>
+    `;
+    displayDiv.querySelector(".question-text").textContent = data.text;
+  } catch (err) {
+    displayDiv.innerHTML = `
+      <div class="question-container">
+        <div class="question-text">Error: ${String(err)}</div>
+      </div>
+    `;
+  } finally {
+    generateBtn.disabled = false;
+  }
+}
+
 </script>
 
 </body>
